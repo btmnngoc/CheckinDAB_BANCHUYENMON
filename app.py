@@ -19,7 +19,7 @@ st.markdown("""
 FILE = "data.csv"
 
 # Tiêu đề
-st.markdown("<h1 style='text-align: center; color: #1E3A8A;'>🏢 Cổng Check-in Phỏng vấn</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #1E3A8A;'>🏢 Cổng Check-in Phỏng vấn Ban Chuyên môn DAB</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; font-size: 18px;'>Chào mừng bạn! Vui lòng điền thông tin bên dưới để lấy số thứ tự nhé.</p>", unsafe_allow_html=True)
 st.divider()
 
