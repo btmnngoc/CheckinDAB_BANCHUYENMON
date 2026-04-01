@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 
-st.set_page_config(page_title="Check-in Phỏng vấn", page_icon="💼", layout="wide")
+st.set_page_config(page_title="Check-in Phỏng vấn Ban Chuyên môn DAB", page_icon="💼", layout="wide")
 
 # CSS làm đẹp giao diện
 st.markdown("""
@@ -30,10 +30,10 @@ with col2:
     with st.form("checkin_form", clear_on_submit=True):
         st.subheader("📝 Thông tin ứng viên")
         
-        # ĐÃ SỬA: Form nhập liệu khớp với 3 cột của Ngọc
+        # Form nhập liệu
         name = st.text_input("Họ và tên", placeholder="VD: Nguyễn Văn A")
         email = st.text_input("Email", placeholder="VD: nguyenvana@gmail.com")
-        committee = st.text_input("Tiểu ban", placeholder="VD: Chuyên môn / Truyền thông")
+        committee = st.text_input("Tiểu ban", placeholder="VD: BA / DA / Tester / PM")
 
         st.write("") 
         submitted = st.form_submit_button("Xác nhận Check-in")
@@ -42,7 +42,7 @@ with col2:
             # Kiểm tra xem có ô nào bị bỏ trống không
             if name.strip() and email.strip() and committee.strip():
                 
-                # Đọc file cũ nếu có, không thì tạo DataFrame mới với đúng 3 cột của Ngọc
+                # Đọc file cũ nếu có, không thì tạo DataFrame mới
                 if os.path.exists(FILE):
                     df = pd.read_csv(FILE)
                 else:
@@ -50,7 +50,7 @@ with col2:
 
                 stt = len(df) + 1
 
-                # ĐÃ SỬA: Tạo dòng dữ liệu mới với key khớp CHÍNH XÁC tên cột trong file CSV
+                # Tạo dòng dữ liệu mới
                 new_row = pd.DataFrame([{
                     "Name": name, 
                     "Email": email, 
@@ -61,7 +61,18 @@ with col2:
                 df = pd.concat([df, new_row], ignore_index=True)
                 df.to_csv(FILE, index=False)
 
-                st.success(f"🎉 **Check-in thành công!** Số thứ tự của bạn là: **{stt}**")
+                # HIỂN THỊ SECTION SỐ THỨ TỰ RIÊNG BIỆT
+                st.success("🎉 Check-in thành công!")
+                
+                # Tạo thẻ "vé" hiển thị số thứ tự
+                st.markdown(f"""
+                    <div style="background-color: #EFF6FF; padding: 25px; border-radius: 12px; border: 2px dashed #3B82F6; text-align: center; margin-top: 15px; margin-bottom: 15px;">
+                        <p style="font-size: 18px; color: #1E3A8A; margin-bottom: 5px; font-weight: bold;">SỐ THỨ TỰ CỦA BẠN</p>
+                        <h1 style="font-size: 70px; color: #DC2626; margin: 0; padding: 0;">{stt}</h1>
+                        <p style="font-size: 15px; color: #4B5563; margin-top: 10px;">Vui lòng ghi nhớ hoặc chụp ảnh lại màn hình này nhé!</p>
+                    </div>
+                """, unsafe_allow_html=True)
+                
                 st.balloons() 
             else:
                 st.error("⚠️ Vui lòng điền đầy đủ thông tin để tiếp tục.")
