@@ -40,9 +40,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- HÀM TẠO HIỆU ỨNG ẢNH BAY BAY ---
+# --- HÀM TẠO HIỆU ỨNG ẢNH BAY BAY (ĐÃ TỐI ƯU) ---
 def throw_custom_stars():
-    # Đọc và mã hóa 4 ảnh thành base64 để nhúng vào web
     image_files = ["star1.png", "star2.png", "star3.png", "star4.png"]
     encoded_images = []
     
@@ -53,29 +52,40 @@ def throw_custom_stars():
                 b64 = base64.b64encode(data).decode()
                 encoded_images.append(f"data:image/png;base64,{b64}")
                 
+    # NẾU KHÔNG TÌM THẤY ẢNH: Tự động dùng icon ngôi sao mặc định để test
     if not encoded_images:
-        return # Nếu không tìm thấy ảnh nào thì bỏ qua hiệu ứng
+        st.warning("⚠️ Nhắc nhẹ BTC: Chưa tìm thấy 4 file ảnh star1.png đến star4.png trên GitHub. Đang dùng ngôi sao mặc định!")
+        # Fallback dùng emoji nếu thiếu ảnh
+        encoded_images = ["https://cdn-icons-png.flaticon.com/512/1828/1828884.png"] 
         
-    # Tạo CSS Animation cho các ảnh bay lên
     css_animation = """
     <style>
     @keyframes flyUpAndSpin {
-        0% { transform: translateY(110vh) rotate(0deg) scale(0.5); opacity: 1; }
-        100% { transform: translateY(-20vh) rotate(360deg) scale(1.2); opacity: 0; }
+        0% { transform: translateY(100vh) rotate(0deg) scale(0.5); opacity: 1; }
+        100% { transform: translateY(-20vh) rotate(360deg) scale(1.5); opacity: 0; }
     }
     .custom-star {
         position: fixed;
         bottom: -10%;
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         background-size: contain;
         background-repeat: no-repeat;
         z-index: 999999;
         pointer-events: none;
-        animation: flyUpAndSpin 3.5s ease-out forwards;
+        animation: flyUpAndSpin 3s ease-out forwards;
     }
     </style>
     """
+    
+    stars_html = ""
+    for i in range(30): 
+        img_src = random.choice(encoded_images)
+        left_pos = random.randint(0, 100) 
+        delay = random.uniform(0, 1.2) 
+        stars_html += f'<div class="custom-star" style="background-image: url({img_src}); left: {left_pos}%; animation-delay: {delay}s;"></div>'
+        
+    st.markdown(css_animation + stars_html, unsafe_allow_html=True)
     
     # Tạo HTML để thả ngẫu nhiên nhiều sao từ 4 ảnh đã chọn
     stars_html = ""
