@@ -50,7 +50,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- HIỆU ỨNG NGÔI SAO TƯƠNG TÁC (KÉO THẢ + PHÁT SÁNG) ---
+# --- HIỆU ỨNG NGÔI SAO TƯƠNG TÁC (KÉO THẢ + LẤP LÁNH) ---
 def get_base64_image(image_path):
     if os.path.exists(image_path):
         with open(image_path, "rb") as f:
@@ -83,19 +83,30 @@ interactive_stars_css_html = f"""
     background-size: contain;
     background-repeat: no-repeat;
     z-index: 999999;
-    cursor: grab; /* Con trỏ hình bàn tay báo hiệu có thể kéo */
-    pointer-events: auto; /* Cho phép tương tác (ấn/kéo) */
+    cursor: grab;
+    pointer-events: auto;
     transition: filter 0.3s ease, transform 0.3s ease;
 }}
 .interactive-star:active {{
-    cursor: grabbing; /* Bàn tay nắm lại khi đang kéo */
+    cursor: grabbing;
 }}
 
-/* Class được gán bằng JavaScript khi nhấn vào */
-.glow-star {{
-    filter: drop-shadow(0px 0px 20px rgba(255, 215, 0, 1)) drop-shadow(0px 0px 40px rgba(252, 94, 21, 0.8)) !important;
-    transform: scale(1.15) !important;
-    animation: none !important; /* Dừng trôi khi đang phát sáng */
+/* CSS cho hạt lấp lánh (sparkles) */
+.sparkle-particle {{
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background-color: #FFE26E; /* Màu vàng DAB */
+    border-radius: 50%;
+    z-index: 999998; /* Nằm ngay dưới ngôi sao */
+    pointer-events: none; /* Không cản trở kéo thả */
+    box-shadow: 0 0 10px #FFE26E, 0 0 20px #FC5E15;
+    animation: sparkle-fade-up 0.8s ease-out forwards;
+}}
+
+@keyframes sparkle-fade-up {{
+    0% {{ transform: translateY(0) scale(1); opacity: 1; }}
+    100% {{ transform: translateY(-30px) scale(0); opacity: 0; }}
 }}
 
 .star-pos-1 {{ top: 12%; left: 8%; background-image: url('{star1}'); animation: floatUpAndDown 4s ease-in-out infinite; }}
@@ -115,14 +126,26 @@ st.markdown(interactive_stars_css_html, unsafe_allow_html=True)
 drag_drop_js = """
 <script>
     const parentDoc = window.parent.document;
-    
+    let sparkleInterval;
+
+    function createSparkle(x, y) {
+        const sparkle = parentDoc.createElement('div');
+        sparkle.className = 'sparkle-particle';
+        sparkle.style.left = (x - 4) + 'px'; // Căn giữa hạt
+        sparkle.style.top = (y - 4) + 'px';
+        parentDoc.body.appendChild(sparkle);
+
+        // Xóa hạt sau khi animation hoàn tất
+        setTimeout(() => sparkle.remove(), 800);
+    }
+
     function makeInteractive(el) {
         let isDragging = false;
         let startX, startY, initialLeft, initialTop;
 
         const dragStart = (e) => {
             e.preventDefault();
-            isDragging = false;
+            isDragging = true;
             
             // Lấy tọa độ (Hỗ trợ cả Chuột trên PC và Chạm trên Mobile)
             const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
@@ -139,6 +162,15 @@ drag_drop_js = """
             el.style.animation = 'none'; 
             el.style.transition = 'none'; 
             
+            // Bắt đầu tạo hiệu ứng lấp lánh liên tục
+            sparkleInterval = setInterval(() => {
+                const currentRect = el.getBoundingClientRect();
+                // Tạo hạt ngẫu nhiên xung quanh ngôi sao
+                const sparkleX = currentRect.left + Math.random() * currentRect.width;
+                const sparkleY = currentRect.top + Math.random() * currentRect.height;
+                createSparkle(sparkleX, sparkleY);
+            }, 50); // 20 hạt mỗi giây
+
             parentDoc.addEventListener('mousemove', dragMove);
             parentDoc.addEventListener('mouseup', dragEnd);
             parentDoc.addEventListener('touchmove', dragMove, {passive: false});
@@ -151,9 +183,6 @@ drag_drop_js = """
             
             const dx = clientX - startX;
             const dy = clientY - startY;
-            
-            // Nếu di chuyển chuộc lớn hơn 3px thì tính là KÉO (drag) chứ không phải CLICK
-            if (Math.abs(dx) > 3 || Math.abs(dy) > 3) isDragging = true;
             
             if (isDragging) {
                 e.preventDefault();
@@ -171,11 +200,10 @@ drag_drop_js = """
             parentDoc.removeEventListener('touchend', dragEnd);
             
             el.style.transition = 'filter 0.3s ease, transform 0.3s ease';
+            isDragging = false;
             
-            // Nếu không kéo mà chỉ thả ra -> Tính là Click -> Bật/Tắt hiệu ứng Phát sáng
-            if (!isDragging) {
-                el.classList.toggle('glow-star');
-            }
+            // Dừng tạo lấp lánh
+            clearInterval(sparkleInterval);
         };
 
         el.addEventListener('mousedown', dragStart);
