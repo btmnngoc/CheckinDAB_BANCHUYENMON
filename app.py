@@ -254,7 +254,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 
 with col2:
     with st.form("checkin_form", clear_on_submit=True):
-        st.markdown("<h3 style='color: #004E98; margin-bottom: 20px; font-size: 22px;'>📝 Thông tin ứng viên</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='color: #004E98; margin-bottom: 20px; font-size: 22px;'>Thông tin ứng viên</h3>", unsafe_allow_html=True)
         
         name = st.text_input("Họ và tên", placeholder="VD: Nguyễn Văn A")
         email = st.text_input("Email", placeholder="VD: nguyenvana@gmail.com")
