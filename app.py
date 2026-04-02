@@ -4,8 +4,6 @@ import gspread
 from google.oauth2.service_account import Credentials
 import base64
 import os
-import random
-import time
 
 st.set_page_config(page_title="Check-in DAB", page_icon="⭐", layout="wide")
 
@@ -40,68 +38,55 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- HÀM TẠO HIỆU ỨNG ẢNH BAY BAY (ĐÃ TỐI ƯU) ---
-def throw_custom_stars():
-    image_files = ["star1.png", "star2.png", "star3.png", "star4.png"]
-    encoded_images = []
-    
-    for img in image_files:
-        if os.path.exists(img):
-            with open(img, "rb") as f:
-                data = f.read()
-                b64 = base64.b64encode(data).decode()
-                encoded_images.append(f"data:image/png;base64,{b64}")
-                
-    # NẾU KHÔNG TÌM THẤY ẢNH: Tự động dùng icon ngôi sao mặc định để test
-    if not encoded_images:
-        st.warning("⚠️ Nhắc nhẹ BTC: Chưa tìm thấy 4 file ảnh star1.png đến star4.png trên GitHub. Đang dùng ngôi sao mặc định!")
-        # Fallback dùng emoji nếu thiếu ảnh
-        encoded_images = ["https://cdn-icons-png.flaticon.com/512/1828/1828884.png"] 
-        
-    css_animation = """
-    <style>
-    @keyframes flyUpAndSpin {
-        0% { transform: translateY(100vh) rotate(0deg) scale(0.5); opacity: 1; }
-        100% { transform: translateY(-20vh) rotate(360deg) scale(1.5); opacity: 0; }
-    }
-    .custom-star {
-        position: fixed;
-        bottom: -10%;
-        width: 50px;
-        height: 50px;
-        background-size: contain;
-        background-repeat: no-repeat;
-        z-index: 999999;
-        pointer-events: none;
-        animation: flyUpAndSpin 3s ease-out forwards;
-    }
-    </style>
-    """
-    
-    stars_html = ""
-    for i in range(30): 
-        img_src = random.choice(encoded_images)
-        left_pos = random.randint(0, 100) 
-        delay = random.uniform(0, 1.2) 
-        stars_html += f'<div class="custom-star" style="background-image: url({img_src}); left: {left_pos}%; animation-delay: {delay}s;"></div>'
-        
-    st.markdown(css_animation + stars_html, unsafe_allow_html=True)
-    
-    # Tạo HTML để thả ngẫu nhiên nhiều sao từ 4 ảnh đã chọn
-    stars_html = ""
-    for i in range(25): # Thả 25 icon bay lên
-        img_src = random.choice(encoded_images)
-        left_pos = random.randint(5, 95) # Vị trí ngẫu nhiên theo chiều ngang
-        delay = random.uniform(0, 1.5) # Độ trễ ngẫu nhiên
-        stars_html += f'<div class="custom-star" style="background-image: url({img_src}); left: {left_pos}%; animation-delay: {delay}s;"></div>'
-        
-    # In ra màn hình
-    placeholder = st.empty()
-    placeholder.markdown(css_animation + stars_html, unsafe_allow_html=True)
-    
-    # Xóa element sau khi bay xong để không nặng web
-    time.sleep(4)
-    placeholder.empty()
+# --- HIỆU ỨNG 4 NGÔI SAO BAY LƠ LỬNG TỪ ĐẦU ---
+def get_base64_image(image_path):
+    if os.path.exists(image_path):
+        with open(image_path, "rb") as f:
+            data = f.read()
+            return f"data:image/png;base64,{base64.b64encode(data).decode()}"
+    # Fallback dùng emoji nếu thiếu ảnh
+    return "https://cdn-icons-png.flaticon.com/512/1828/1828884.png"
+
+# Tải 4 ảnh (hoặc ảnh fallback)
+star1 = get_base64_image("star1.png")
+star2 = get_base64_image("star2.png")
+star3 = get_base64_image("star3.png")
+star4 = get_base64_image("star4.png")
+
+floating_stars_css = f"""
+<style>
+@keyframes floatUpAndDown {{
+    0% {{ transform: translateY(0px) rotate(0deg); }}
+    50% {{ transform: translateY(-20px) rotate(10deg); }}
+    100% {{ transform: translateY(0px) rotate(0deg); }}
+}}
+@keyframes floatSideToSide {{
+    0% {{ transform: translateX(0px) translateY(0px) rotate(0deg); }}
+    50% {{ transform: translateX(15px) translateY(-15px) rotate(-10deg); }}
+    100% {{ transform: translateX(0px) translateY(0px) rotate(0deg); }}
+}}
+.static-star {{
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.8;
+}}
+.star-pos-1 {{ top: 15%; left: 10%; background-image: url('{star1}'); animation: floatUpAndDown 4s ease-in-out infinite; }}
+.star-pos-2 {{ top: 20%; right: 12%; background-image: url('{star2}'); animation: floatSideToSide 5s ease-in-out infinite; }}
+.star-pos-3 {{ bottom: 15%; left: 12%; background-image: url('{star3}'); animation: floatSideToSide 6s ease-in-out infinite; }}
+.star-pos-4 {{ bottom: 20%; right: 10%; background-image: url('{star4}'); animation: floatUpAndDown 4.5s ease-in-out infinite; }}
+</style>
+<div class="static-star star-pos-1"></div>
+<div class="static-star star-pos-2"></div>
+<div class="static-star star-pos-3"></div>
+<div class="static-star star-pos-4"></div>
+"""
+st.markdown(floating_stars_css, unsafe_allow_html=True)
+
 
 # --- KẾT NỐI GOOGLE SHEETS ---
 SHEET_NAME = "Check-in DAB" 
@@ -122,6 +107,7 @@ sheet = client.open(SHEET_NAME).sheet1
 data = sheet.get_all_values()
 # Nếu sheet đã có dòng tiêu đề, số thứ tự sẽ bằng đúng số lượng dòng hiện tại
 stt_hien_tai = len(data) if len(data) > 0 else 1
+
 
 # --- GIAO DIỆN CHÍNH ---
 st.markdown("<h1 style='text-align: center; color: #004E98; font-weight: 800;'>CỔNG CHECK-IN PHỎNG VẤN<br><span style='color: #FC5E15;'>BAN CHUYÊN MÔN DAB</span></h1>", unsafe_allow_html=True)
@@ -159,8 +145,8 @@ with col2:
                         </div>
                     """, unsafe_allow_html=True)
                     
-                    # Gọi hàm tung ảnh tùy chỉnh thay vì st.balloons()
-                    throw_custom_stars() 
+                    # Trả lại hiệu ứng bóng bay mặc định của Streamlit
+                    st.balloons() 
                     
                 except Exception as e:
                     st.error(f"Đã xảy ra lỗi khi lưu dữ liệu: {e}")
