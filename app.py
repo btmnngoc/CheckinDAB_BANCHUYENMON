@@ -108,8 +108,10 @@ def init_connection():
 
 client = init_connection()
 sheet = client.open(SHEET_NAME).sheet1
-data = sheet.get_all_records()
-stt_hien_tai = len(data) + 1
+# Dùng get_all_values() sẽ an toàn hơn, không bị lỗi dù sheet trống
+data = sheet.get_all_values()
+# Nếu sheet đã có dòng tiêu đề, số thứ tự sẽ bằng đúng số lượng dòng hiện tại
+stt_hien_tai = len(data) if len(data) > 0 else 1
 
 # --- GIAO DIỆN CHÍNH ---
 st.markdown("<h1 style='text-align: center; color: #004E98; font-weight: 800;'>CỔNG CHECK-IN PHỎNG VẤN<br><span style='color: #FC5E15;'>BAN CHUYÊN MÔN DAB</span></h1>", unsafe_allow_html=True)
