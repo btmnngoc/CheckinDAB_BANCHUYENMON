@@ -290,10 +290,12 @@ with col2:
                         f'<div style="margin: 20px auto 15px auto; height: 35px; width: 80%; background: repeating-linear-gradient(to right, #004E98, #004E98 4px, transparent 4px, transparent 8px, #004E98 8px, #004E98 10px, transparent 10px, transparent 14px, #004E98 14px, #004E98 20px, transparent 20px, transparent 22px); opacity: 0.7; border-radius: 2px;"></div>'
                         f'<p style="margin: 0; font-size: 13px; color: #94a3b8; font-style: italic; font-weight: 500;">📸 Vui lòng ghi nhớ số vé này nhé!</p></div></div>'
                     )
+                    
+                    # DÒNG LỆNH QUAN TRỌNG ĐỂ IN VÉ RA MÀN HÌNH NÈ
+                    st.markdown(ticket_html, unsafe_allow_html=True)
+                    
                     # Trả lại hiệu ứng bóng bay mặc định của Streamlit
                     st.balloons() 
                     
                 except Exception as e:
                     st.error(f"Đã xảy ra lỗi khi lưu dữ liệu: {e}")
-            else:
-                st.error("⚠️ Vui lòng điền đầy đủ thông tin để tiếp tục.")
