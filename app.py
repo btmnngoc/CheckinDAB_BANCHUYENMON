@@ -142,44 +142,17 @@ with col2:
         if submitted:
             if name.strip() and email.strip() and committee.strip():
                 try:
-                    # Ghi dữ liệu trực tiếp lên Google Sheets
+                   # Ghi dữ liệu trực tiếp lên Google Sheets
                     row_to_insert = [name, email, committee]
                     sheet.append_row(row_to_insert)
                     
-                    # CĂN LỀ TRÁI TOÀN BỘ ĐOẠN HTML NÀY ĐỂ KHÔNG BỊ BIẾN THÀNH CODE BLOCK
-ticket_html = f"""
-<div style="margin: 30px auto 10px auto; max-width: 380px; background: white; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; position: relative; overflow: hidden;">
-    
-    <div style="background-color: #004E98; color: white; padding: 20px; text-align: center;">
-        <h2 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 2px;">VÉ CHỜ PHỎNG VẤN</h2>
-        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.8;">DAB CLUB</p>
-    </div>
-    
-    <div style="position: relative; height: 0; border-top: 3px dashed #FC5E15; margin-top: 0px;">
-        <div style="position: absolute; top: -15px; left: -15px; width: 30px; height: 30px; background-color: #F8FAFC; border-radius: 50%; box-shadow: inset -3px 0 5px rgba(0,0,0,0.05);"></div>
-        <div style="position: absolute; top: -15px; right: -15px; width: 30px; height: 30px; background-color: #F8FAFC; border-radius: 50%; box-shadow: inset 3px 0 5px rgba(0,0,0,0.05);"></div>
-    </div>
-    
-    <div style="background-color: #FFE26E; padding: 40px 20px; text-align: center;">
-        <p style="margin: 0; font-size: 15px; color: #004E98; font-weight: 700; text-transform: uppercase;">Số Thứ Tự Của Bạn</p>
-        <h1 style="margin: 10px 0; font-size: 90px; color: #FF6E2B; line-height: 1; font-weight: 900; text-shadow: 3px 3px 0px rgba(255,255,255,0.9);">{stt_hien_tai}</h1>
-    </div>
-    
-    <div style="padding: 20px; text-align: center; background-color: white;">
-        <h3 style="margin: 0; color: #004E98; font-size: 18px; text-transform: uppercase;">{name}</h3>
-        <p style="margin: 5px 0 0 0; color: #64748b; font-size: 15px;">Tiểu ban: <span style="font-weight: 800; color: #FC5E15;">{committee}</span></p>
-        
-        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 15px 0;">
-        
-        <p style="margin: 0; font-size: 13px; color: #94a3b8; font-style: italic;">📸 Vui lòng chụp ảnh màn hình vé này nhé!</p>
-    </div>
-</div>
-"""
+                    # Đã nối toàn bộ thành 1 dòng duy nhất để Streamlit không bị lỗi Markdown
+                    ticket_html = f"""<div style="margin: 30px auto 10px auto; max-width: 380px; background: white; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; position: relative; overflow: hidden;"><div style="background-color: #004E98; color: white; padding: 20px; text-align: center;"><h2 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 2px;">VÉ CHỜ PHỎNG VẤN</h2><p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.8;">DAB CLUB</p></div><div style="position: relative; height: 0; border-top: 3px dashed #FC5E15; margin-top: 0px;"><div style="position: absolute; top: -15px; left: -15px; width: 30px; height: 30px; background-color: #F8FAFC; border-radius: 50%; box-shadow: inset -3px 0 5px rgba(0,0,0,0.05);"></div><div style="position: absolute; top: -15px; right: -15px; width: 30px; height: 30px; background-color: #F8FAFC; border-radius: 50%; box-shadow: inset 3px 0 5px rgba(0,0,0,0.05);"></div></div><div style="background-color: #FFE26E; padding: 40px 20px; text-align: center;"><p style="margin: 0; font-size: 15px; color: #004E98; font-weight: 700; text-transform: uppercase;">Số Thứ Tự Của Bạn</p><h1 style="margin: 10px 0; font-size: 90px; color: #FF6E2B; line-height: 1; font-weight: 900; text-shadow: 3px 3px 0px rgba(255,255,255,0.9);">{stt_hien_tai}</h1></div><div style="padding: 20px; text-align: center; background-color: white;"><h3 style="margin: 0; color: #004E98; font-size: 18px; text-transform: uppercase;">{name}</h3><p style="margin: 5px 0 0 0; color: #64748b; font-size: 15px;">Tiểu ban: <span style="font-weight: 800; color: #FC5E15;">{committee}</span></p><hr style="border: none; border-top: 1px solid #e2e8f0; margin: 15px 0;"><p style="margin: 0; font-size: 13px; color: #94a3b8; font-style: italic;">📸 Vui lòng chụp ảnh màn hình vé này nhé!</p></div></div>"""
+                    
                     st.markdown(ticket_html, unsafe_allow_html=True)
                     
                     # Trả lại hiệu ứng bóng bay mặc định của Streamlit
                     st.balloons()
-                    
                 except Exception as e:
                     st.error(f"Đã xảy ra lỗi khi lưu dữ liệu: {e}")
             else:
