@@ -78,8 +78,8 @@ floating_stars_css = f"""
 }}
 .static-star {{
     position: fixed;
-    width: 110px;  /* Đã tăng kích thước sao to hơn */
-    height: 110px; /* Đã tăng kích thước sao to hơn */
+    width: 220px;  /* Đã tăng kích thước sao to hơn */
+    height: 220px; /* Đã tăng kích thước sao to hơn */
     background-size: contain;
     background-repeat: no-repeat;
     z-index: 9999;
@@ -147,7 +147,7 @@ with col2:
                     sheet.append_row(row_to_insert)
                     
                     # CĂN LỀ TRÁI TOÀN BỘ ĐOẠN HTML NÀY ĐỂ KHÔNG BỊ BIẾN THÀNH CODE BLOCK
-                    ticket_html = f"""
+ticket_html = f"""
 <div style="margin: 30px auto 10px auto; max-width: 380px; background: white; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; position: relative; overflow: hidden;">
     
     <div style="background-color: #004E98; color: white; padding: 20px; text-align: center;">
