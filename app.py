@@ -130,7 +130,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 
 with col2:
     with st.form("checkin_form", clear_on_submit=True):
-        st.markdown("<h3 style='color: #004E98; margin-bottom: 20px; font-size: 22px;'>📝 Thông tin ứng viên</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='color: #004E98; margin-bottom: 20px; font-size: 22px;'>Thông tin ứng viên</h3>", unsafe_allow_html=True)
         
         name = st.text_input("Họ và tên", placeholder="VD: Nguyễn Văn A")
         email = st.text_input("Email", placeholder="VD: nguyenvana@gmail.com")
@@ -171,7 +171,7 @@ with col2:
                             
                             <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 15px 0;">
                             
-                            <p style="margin: 0; font-size: 13px; color: #94a3b8; font-style: italic;">📸 Vui lòng chụp ảnh màn hình vé này nhé!</p>
+                            <p style="margin: 0; font-size: 13px; color: #94a3b8; font-style: italic;"> Vui lòng chụp ảnh màn hình vé này hoặc nhớ số vé nhé!</p>
                         </div>
                     </div>
                     """
