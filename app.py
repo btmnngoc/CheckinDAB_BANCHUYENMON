@@ -11,8 +11,8 @@ st.set_page_config(page_title="Check-in DAB", page_icon="⭐", layout="wide")
 # ==========================================
 # CẤU HÌNH LINK GOOGLE MEET TẠI ĐÂY
 # ==========================================
-LINK_MEET_1 = "https://meet.google.com/abc-xyz-123" # <--- Ngọc thay link 1 vào đây
-LINK_MEET_2 = "https://meet.google.com/def-uvw-456" # <--- Ngọc thay link 2 vào đây
+LINK_MEET_1 = "https://meet.google.com/xye-mima-icg" # <--- Ngọc thay link 1 vào đây
+LINK_MEET_2 = "https://meet.google.com/bjc-ucnq-apu" # <--- Ngọc thay link 2 vào đây
 # ==========================================
 
 # --- MÀU SẮC CHỦ ĐẠO CỦA DAB ---
