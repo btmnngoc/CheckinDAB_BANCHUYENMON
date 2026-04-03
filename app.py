@@ -11,9 +11,11 @@ st.set_page_config(page_title="Check-in DAB", page_icon="⭐", layout="wide")
 # ==========================================
 # CẤU HÌNH LIÊN KẾT TẠI ĐÂY
 # ==========================================
-LINK_MEET_1 = "https://meet.google.com/abc-xyz-123" 
-LINK_MEET_2 = "https://meet.google.com/def-uvw-456" 
-LINK_CALENDAR = "https://calendar.app.google/hRLAyZwBPR3vGSww9" # <--- Link lịch Ngọc mới gửi
+LINK_MEET_1 = "https://meet.google.com/xye-mima-icg" # <--- Nhớ dán link Meet phòng 1 của Ngọc vào đây
+LINK_MEET_2 = "https://meet.google.com/bjc-ucnq-apu" # <--- Nhớ dán link Meet phòng 2 của Ngọc vào đây
+
+LINK_CALENDAR_1 = "https://calendar.app.google/qb4NowMZsKmgGNJy5" # Lịch Phòng 1
+LINK_CALENDAR_2 = "https://calendar.app.google/tY5VW4eSLtYEF9Zt8" # Lịch Phòng 2
 # ==========================================
 
 # --- MÀU SẮC CHỦ ĐẠO CỦA DAB ---
@@ -168,10 +170,15 @@ with col2:
         if submitted:
             if name.strip() and email.strip() and committee.strip():
                 try:
+                    # Tự động gán Phòng, Link Meet và Link Calendar dựa trên Số Thứ Tự
                     if stt_hien_tai % 2 != 0:
-                        phong_phong_van, link_duoc_giao = "Phòng 1", LINK_MEET_1
+                        phong_phong_van = "Phòng 1"
+                        link_duoc_giao = LINK_MEET_1
+                        link_calendar_duoc_giao = LINK_CALENDAR_1
                     else:
-                        phong_phong_van, link_duoc_giao = "Phòng 2", LINK_MEET_2
+                        phong_phong_van = "Phòng 2"
+                        link_duoc_giao = LINK_MEET_2
+                        link_calendar_duoc_giao = LINK_CALENDAR_2
                         
                     pair_index = (stt_hien_tai - 1) // 2 
                     total_minutes = pair_index * 7
@@ -180,7 +187,7 @@ with col2:
                     
                     sheet.append_row([name, email, committee, thoi_gian_duoc_giao, phong_phong_van])
                     
-                    # TẤM VÉ CẬP NHẬT THÊM NÚT CALENDAR
+                    # TẤM VÉ CẬP NHẬT THÊM NÚT CALENDAR TƯƠNG ỨNG TỪNG PHÒNG
                     ticket_html = (
                         f'<div style="margin: 30px auto 10px auto; max-width: 400px; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); border: 2px solid #ffffff; position: relative; overflow: hidden; transform: perspective(1000px) translateZ(0);">'
                         f'<div style="background: linear-gradient(135deg, #004E98, #002B5E); color: white; padding: 25px 20px; text-align: center; position: relative;">'
@@ -200,7 +207,7 @@ with col2:
                         f'<p style="margin: 0 0 8px 0; font-size: 15px; color: #004E98; font-weight: 600;">⏰ Thời gian dự kiến: <strong style="color: #FC5E15; font-size: 18px;">{thoi_gian_duoc_giao}</strong></p>'
                         f'<p style="margin: 0; font-size: 15px; color: #004E98; font-weight: 600;">🚪 Phòng: <strong style="color: #FC5E15; font-size: 16px;">{phong_phong_van}</strong></p>'
                         f'<a href="{link_duoc_giao}" target="_blank" style="display: block; margin-top: 12px; background: linear-gradient(to right, #0ea5e9, #0284c7); color: white; padding: 10px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: bold; text-align: center; box-shadow: 0 4px 6px rgba(2, 132, 199, 0.3);">👉 BẤM VÀO ĐÂY ĐỂ VÀO MEET</a>'
-                        f'<a href="{LINK_CALENDAR}" target="_blank" style="display: block; margin-top: 8px; background: white; color: #004E98; padding: 9px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: bold; text-align: center; border: 2px solid #0ea5e9;">📅 LƯU LỊCH PHỎNG VẤN</a>'
+                        f'<a href="{link_calendar_duoc_giao}" target="_blank" style="display: block; margin-top: 8px; background: white; color: #004E98; padding: 9px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: bold; text-align: center; border: 2px solid #0ea5e9;">📅 LƯU LỊCH PHỎNG VẤN</a>'
                         f'</div></div>'
                         f'<div style="padding: 15px 20px; text-align: center; background-color: white;">'
                         f'<div style="margin: 5px auto 15px auto; height: 35px; width: 80%; background: repeating-linear-gradient(to right, #004E98, #004E98 4px, transparent 4px, transparent 8px, #004E98 8px, #004E98 10px, transparent 10px, transparent 14px, #004E98 14px, #004E98 20px, transparent 20px, transparent 22px); opacity: 0.7; border-radius: 2px;"></div>'
