@@ -8,6 +8,13 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Check-in DAB", page_icon="⭐", layout="wide")
 
+# ==========================================
+# CẤU HÌNH LINK GOOGLE MEET TẠI ĐÂY
+# ==========================================
+LINK_MEET_1 = "https://meet.google.com/abc-xyz-123" # <--- Ngọc thay link 1 vào đây
+LINK_MEET_2 = "https://meet.google.com/def-uvw-456" # <--- Ngọc thay link 2 vào đây
+# ==========================================
+
 # --- MÀU SẮC CHỦ ĐẠO CỦA DAB ---
 # 004E98 (Xanh đậm), FC5E15 (Cam sáng), FFE26E (Vàng nhạt), FF6E2B (Cam đậm)
 
@@ -122,7 +129,7 @@ interactive_stars_css_html = f"""
 """
 st.markdown(interactive_stars_css_html, unsafe_allow_html=True)
 
-# Bơm Script điều khiển kéo thả và click bằng components của Streamlit (Giúp lách luật chặn JS)
+# Bơm Script điều khiển kéo thả và click bằng components của Streamlit
 drag_drop_js = """
 <script>
     const parentDoc = window.parent.document;
@@ -131,11 +138,9 @@ drag_drop_js = """
     function createSparkle(x, y) {
         const sparkle = parentDoc.createElement('div');
         sparkle.className = 'sparkle-particle';
-        sparkle.style.left = (x - 4) + 'px'; // Căn giữa hạt
+        sparkle.style.left = (x - 4) + 'px'; 
         sparkle.style.top = (y - 4) + 'px';
         parentDoc.body.appendChild(sparkle);
-
-        // Xóa hạt sau khi animation hoàn tất
         setTimeout(() => sparkle.remove(), 800);
     }
 
@@ -146,30 +151,24 @@ drag_drop_js = """
         const dragStart = (e) => {
             e.preventDefault();
             isDragging = true;
-            
-            // Lấy tọa độ (Hỗ trợ cả Chuột trên PC và Chạm trên Mobile)
             const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
             const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
             
             startX = clientX;
             startY = clientY;
-            
             const rect = el.getBoundingClientRect();
             initialLeft = rect.left;
             initialTop = rect.top;
             
-            // Tạm dừng hiệu ứng trôi lúc đang kéo
             el.style.animation = 'none'; 
             el.style.transition = 'none'; 
             
-            // Bắt đầu tạo hiệu ứng lấp lánh liên tục
             sparkleInterval = setInterval(() => {
                 const currentRect = el.getBoundingClientRect();
-                // Tạo hạt ngẫu nhiên xung quanh ngôi sao
                 const sparkleX = currentRect.left + Math.random() * currentRect.width;
                 const sparkleY = currentRect.top + Math.random() * currentRect.height;
                 createSparkle(sparkleX, sparkleY);
-            }, 50); // 20 hạt mỗi giây
+            }, 50); 
 
             parentDoc.addEventListener('mousemove', dragMove);
             parentDoc.addEventListener('mouseup', dragEnd);
@@ -188,7 +187,7 @@ drag_drop_js = """
                 e.preventDefault();
                 el.style.left = initialLeft + dx + 'px';
                 el.style.top = initialTop + dy + 'px';
-                el.style.right = 'auto'; // Xóa thuộc tính right/bottom cũ để di chuyển mượt 
+                el.style.right = 'auto'; 
                 el.style.bottom = 'auto';
             }
         };
@@ -201,8 +200,6 @@ drag_drop_js = """
             
             el.style.transition = 'filter 0.3s ease, transform 0.3s ease';
             isDragging = false;
-            
-            // Dừng tạo lấp lánh
             clearInterval(sparkleInterval);
         };
 
@@ -210,7 +207,6 @@ drag_drop_js = """
         el.addEventListener('touchstart', dragStart, {passive: false});
     }
 
-    // Tìm tất cả các ngôi sao và gắn hàm tương tác
     const stars = parentDoc.querySelectorAll('.interactive-star');
     stars.forEach(star => {
         if (!star.dataset.interactive) {
@@ -220,9 +216,7 @@ drag_drop_js = """
     });
 </script>
 """
-# Nhúng JS ngầm (ẩn iframe để không chiếm diện tích)
 components.html(drag_drop_js, height=0, width=0)
-
 
 # --- KẾT NỐI GOOGLE SHEETS ---
 SHEET_NAME = "Check-in DAB" 
@@ -239,14 +233,11 @@ def init_connection():
 
 client = init_connection()
 sheet = client.open(SHEET_NAME).sheet1
-# Dùng get_all_values() sẽ an toàn hơn, không bị lỗi dù sheet trống
 data = sheet.get_all_values()
-# Nếu sheet đã có dòng tiêu đề, số thứ tự sẽ bằng đúng số lượng dòng hiện tại
 stt_hien_tai = len(data) if len(data) > 0 else 1
 
-
 # --- GIAO DIỆN CHÍNH ---
-st.write("") # Spacer
+st.write("") 
 st.markdown("<h1 style='text-align: center; color: #004E98; font-weight: 900; letter-spacing: -0.5px;'>CỔNG CHECK-IN PHỎNG VẤN<br><span style='color: #FC5E15;'>BAN CHUYÊN MÔN DAB</span></h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; font-size: 17px; color: #64748b; margin-bottom: 30px;'>Chào mừng bạn! Vui lòng điền thông tin bên dưới để lấy số thứ tự nhé.</p>", unsafe_allow_html=True)
 
@@ -266,11 +257,37 @@ with col2:
         if submitted:
             if name.strip() and email.strip() and committee.strip():
                 try:
-                    # Ghi dữ liệu trực tiếp lên Google Sheets
-                    row_to_insert = [name, email, committee]
+                    # ==========================================
+                    # THUẬT TOÁN TÍNH LINK VÀ GIỜ (MỚI THÊM)
+                    # ==========================================
+                    
+                    # 1. Tính Link (Lẻ -> Phòng 1, Chẵn -> Phòng 2)
+                    if stt_hien_tai % 2 != 0:
+                        phong_phong_van = "Phòng 1"
+                        link_duoc_giao = LINK_MEET_1
+                    else:
+                        phong_phong_van = "Phòng 2"
+                        link_duoc_giao = LINK_MEET_2
+                        
+                    # 2. Tính Thời gian (Cứ 2 người/1 cặp thì cộng 7 phút)
+                    # STT 1, 2 -> index = 0 -> 0 phút
+                    # STT 3, 4 -> index = 1 -> 7 phút
+                    # STT 5, 6 -> index = 2 -> 14 phút
+                    pair_index = (stt_hien_tai - 1) // 2 
+                    total_minutes = pair_index * 7
+                    
+                    # Cộng giờ (Bắt đầu từ 21:00)
+                    gio = 21 + (total_minutes // 60)
+                    phut = total_minutes % 60
+                    thoi_gian_duoc_giao = f"{gio:02d}:{phut:02d}" # Format về dạng 21:07
+                    
+                    # Ghi dữ liệu trực tiếp lên Google Sheets (Thêm Giờ và Link vào CSDL luôn nếu muốn)
+                    row_to_insert = [name, email, committee, thoi_gian_duoc_giao, phong_phong_van]
                     sheet.append_row(row_to_insert)
                     
-                    # Dùng ngoặc tròn () để nối chuỗi an toàn, không bị cắt cụt khi copy
+                    # ==========================================
+                    # HIỂN THỊ TẤM VÉ ĐÃ ĐƯỢC CẬP NHẬT GIAO DIỆN
+                    # ==========================================
                     ticket_html = (
                         f'<div style="margin: 30px auto 10px auto; max-width: 400px; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); border: 2px solid #ffffff; position: relative; overflow: hidden; transform: perspective(1000px) translateZ(0);">'
                         f'<div style="background: linear-gradient(135deg, #004E98, #002B5E); color: white; padding: 25px 20px; text-align: center; position: relative;">'
@@ -282,20 +299,29 @@ with col2:
                         f'<div style="position: absolute; top: -15px; right: -15px; width: 30px; height: 30px; background-color: #F8FAFC; border-radius: 50%; box-shadow: inset 4px 0 6px rgba(0,0,0,0.08);"></div></div>'
                         f'<div style="background: linear-gradient(180deg, #FAFAFA 0%, #FFFFFF 100%); padding: 30px 20px; text-align: center; border-bottom: 2px dashed #f1f5f9;">'
                         f'<p style="margin: 0; font-size: 14px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">Số Thứ Tự</p>'
-                        f'<h1 style="margin: 15px 0; font-size: 100px; color: #FF6E2B; line-height: 1; font-weight: 900; text-shadow: 4px 4px 0px #FFE26E, 8px 8px 0px rgba(252, 94, 21, 0.15);">{stt_hien_tai}</h1></div>'
-                        f'<div style="padding: 25px 20px; text-align: center; background-color: white;">'
-                        f'<h3 style="margin: 0 0 10px 0; color: #004E98; font-size: 20px; font-weight: 800; text-transform: uppercase;">{name}</h3>'
-                        f'<div style="display: inline-block; background: #FFF3EB; padding: 6px 16px; border-radius: 20px; border: 1px solid #FFD8C4;">'
+                        f'<h1 style="margin: 15px 0 5px 0; font-size: 100px; color: #FF6E2B; line-height: 1; font-weight: 900; text-shadow: 4px 4px 0px #FFE26E, 8px 8px 0px rgba(252, 94, 21, 0.15);">{stt_hien_tai}</h1>'
+                        f'<h3 style="margin: 0; color: #004E98; font-size: 22px; font-weight: 800; text-transform: uppercase;">{name}</h3>'
+                        f'<div style="display: inline-block; background: #FFF3EB; padding: 6px 16px; border-radius: 20px; border: 1px solid #FFD8C4; margin-top: 10px;">'
                         f'<p style="margin: 0; color: #64748b; font-size: 14px; font-weight: 600;">Tiểu ban: <span style="font-weight: 900; color: #FC5E15; font-size: 15px;">{committee}</span></p></div>'
-                        f'<div style="margin: 20px auto 15px auto; height: 35px; width: 80%; background: repeating-linear-gradient(to right, #004E98, #004E98 4px, transparent 4px, transparent 8px, #004E98 8px, #004E98 10px, transparent 10px, transparent 14px, #004E98 14px, #004E98 20px, transparent 20px, transparent 22px); opacity: 0.7; border-radius: 2px;"></div>'
-                        f'<p style="margin: 0; font-size: 13px; color: #94a3b8; font-style: italic; font-weight: 500;">📸 Vui lòng ghi nhớ số vé này nhé!</p></div></div>'
+                        
+                        # --- KHU VỰC HIỂN THỊ LINK & GIỜ MỚI THÊM ---
+                        f'<div style="background: #F8FAFC; padding: 15px; border-radius: 12px; margin-top: 20px; border: 1px dashed #cbd5e1; text-align: left;">'
+                        f'<p style="margin: 0 0 8px 0; font-size: 15px; color: #004E98; font-weight: 600;">⏰ Thời gian dự kiến: <strong style="color: #FC5E15; font-size: 18px;">{thoi_gian_duoc_giao}</strong></p>'
+                        f'<p style="margin: 0; font-size: 15px; color: #004E98; font-weight: 600;">🚪 Phòng: <strong style="color: #FC5E15; font-size: 16px;">{phong_phong_van}</strong></p>'
+                        f'<a href="{link_duoc_giao}" target="_blank" style="display: block; margin-top: 12px; background: linear-gradient(to right, #0ea5e9, #0284c7); color: white; padding: 10px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: bold; text-align: center; box-shadow: 0 4px 6px rgba(2, 132, 199, 0.3);">👉 BẤM VÀO ĐÂY ĐỂ VÀO MEET</a>'
+                        f'</div>'
+                        # -------------------------------------------
+                        
+                        f'</div>'
+                        f'<div style="padding: 15px 20px; text-align: center; background-color: white;">'
+                        f'<div style="margin: 5px auto 15px auto; height: 35px; width: 80%; background: repeating-linear-gradient(to right, #004E98, #004E98 4px, transparent 4px, transparent 8px, #004E98 8px, #004E98 10px, transparent 10px, transparent 14px, #004E98 14px, #004E98 20px, transparent 20px, transparent 22px); opacity: 0.7; border-radius: 2px;"></div>'
+                        f'<p style="margin: 0; font-size: 13px; color: #94a3b8; font-style: italic; font-weight: 500;">📸 Chụp màn hình để không quên giờ nhé!</p></div></div>'
                     )
                     
-                    # DÒNG LỆNH QUAN TRỌNG ĐỂ IN VÉ RA MÀN HÌNH NÈ
                     st.markdown(ticket_html, unsafe_allow_html=True)
-                    
-                    # Trả lại hiệu ứng bóng bay mặc định của Streamlit
                     st.balloons() 
                     
                 except Exception as e:
                     st.error(f"Đã xảy ra lỗi khi lưu dữ liệu: {e}")
+            else:
+                st.error("⚠️ Vui lòng điền đầy đủ thông tin để tiếp tục.")
